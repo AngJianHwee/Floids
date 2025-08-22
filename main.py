@@ -21,6 +21,7 @@ frame_rate = 30  # Default frame rate
 button_width = 80
 button_height = 30
 button_color = (100, 100, 100)
+button_selected_color = (50, 50, 50)  # Darker when selected
 button_text_color = (255, 255, 255)
 
 # Calculate positions for bottom right corner
@@ -32,6 +33,14 @@ play_pause_button_rect = pygame.Rect(button_x, button_y_start, button_width, but
 slow_button_rect = pygame.Rect(button_x, button_y_start + button_spacing, button_width, button_height)
 fast_button_rect = pygame.Rect(button_x, button_y_start + 2 * button_spacing, button_width, button_height)
 very_fast_button_rect = pygame.Rect(button_x, button_y_start + 3 * button_spacing, button_width, button_height)
+
+# Store button states
+button_states = {
+    "play_pause": False,
+    "slow": False,
+    "fast": False,
+    "very_fast": False
+}
 
 font = pygame.font.Font(None, 24)  # Default font, size 24
 
@@ -69,20 +78,36 @@ while run:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if play_pause_button_rect.collidepoint(event.pos):
                 paused = not paused
+                button_states["play_pause"] = not button_states["play_pause"]
+                button_states["slow"] = False
+                button_states["fast"] = False
+                button_states["very_fast"] = False
             elif slow_button_rect.collidepoint(event.pos):
                 frame_rate = 1
+                button_states["slow"] = True
+                button_states["fast"] = False
+                button_states["very_fast"] = False
+                button_states["play_pause"] = False
             elif fast_button_rect.collidepoint(event.pos):
                 frame_rate = 5
+                button_states["fast"] = True
+                button_states["slow"] = False
+                button_states["very_fast"] = False
+                button_states["play_pause"] = False
             elif very_fast_button_rect.collidepoint(event.pos):
                 frame_rate = 30
+                button_states["very_fast"] = True
+                button_states["slow"] = False
+                button_states["fast"] = False
+                button_states["play_pause"] = False
 
     GUI.fill((0, 0, 0))
 
     # Draw buttons
-    draw_button(GUI, play_pause_button_rect, button_color, "Play/Pause" if not paused else "Resume")
-    draw_button(GUI, slow_button_rect, button_color, "1 FPS")
-    draw_button(GUI, fast_button_rect, button_color, "5 FPS")
-    draw_button(GUI, very_fast_button_rect, button_color, "30 FPS")
+    draw_button(GUI, play_pause_button_rect, button_selected_color if button_states["play_pause"] else button_color, "Play/Pause" if not paused else "Resume")
+    draw_button(GUI, slow_button_rect, button_selected_color if button_states["slow"] else button_color, "1 FPS")
+    draw_button(GUI, fast_button_rect, button_selected_color if button_states["fast"] else button_color, "5 FPS")
+    draw_button(GUI, very_fast_button_rect, button_selected_color if button_states["very_fast"] else button_color, "30 FPS")
 
     # Adjust triangle position to center it
     triangle_points = (
@@ -105,4 +130,3 @@ while run:
 
 pygame.quit()
 sys.exit()
-
