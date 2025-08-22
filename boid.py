@@ -10,6 +10,11 @@ class Boid:
         self.acceleration = pygame.math.Vector2(0, 0)
         self.size = (10, 20) # Default size for boids
         self.color = WHITE # Default color
+        # random 0.1 probability
+        if random.random() < 0.1:
+            self._render_forces = True
+        else:
+            self._render_forces = False
 
     def _apply_force(self, force):
         self.acceleration += force
@@ -78,6 +83,11 @@ class Boid:
         cohesion_force = self._cohesion(all_boids) * COHESION_WEIGHT
         alignment_force = self._alignment(all_boids) * ALIGNMENT_WEIGHT
         separation_force = self._separation(all_boids) * SEPARATION_WEIGHT
+        
+        # save the forces to self
+        self._cohesion_force = cohesion_force
+        self._alignment_force = alignment_force
+        self._separation_force = separation_force
 
         self._apply_force(cohesion_force)
         self._apply_force(alignment_force)
@@ -115,3 +125,16 @@ class Boid:
             rotated_points.append((rotated_x, rotated_y))
         
         pygame.draw.polygon(screen, self.color, rotated_points)
+        
+        if self._render_forces:
+            # draw the cohesion , alignment, and separation force
+            pygame.draw.line(screen, CYAN, self.position, self.position + self._cohesion_force * 500, 3)
+            pygame.draw.line(screen, GREEN, self.position, self.position + self._alignment_force * 500, 3)
+            pygame.draw.line(screen, RED, self.position, self.position + self._separation_force * 500, 3)
+            
+
+            # Draw perception and separation circles
+            pygame.draw.circle(screen, YELLOW, (int(self.position.x), int(self.position.y)), PERCEPTION_RADIUS, 1)
+            pygame.draw.circle(screen, RED, (int(self.position.x), int(self.position.y)), SEPARATION_RADIUS, 1)
+            
+            
