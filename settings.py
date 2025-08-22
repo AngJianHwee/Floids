@@ -5,15 +5,28 @@ import pygame
 # Screen settings
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-GAME_CAPTION = "The incredible guessing game"
+GAME_CAPTION = "Boids Simulation"
+
+# Boids settings
+BOID_COUNT = 50
+PERCEPTION_RADIUS = 75
+SEPARATION_RADIUS = 25
+MAX_SPEED = 3
+MAX_FORCE = 0.05
+
+# Flocking rule weights
+COHESION_WEIGHT = 1.0
+ALIGNMENT_WEIGHT = 1.5
+SEPARATION_WEIGHT = 2.0
 
 # Frame Rates
 FPS_OPTIONS = {
     "slow": 1,
     "fast": 5,
-    "very_fast": 30
+    "very_fast": 30,
+    "extremely_fast": 120,
 }
-DEFAULT_FPS = FPS_OPTIONS["very_fast"]
+DEFAULT_FPS = FPS_OPTIONS["extremely_fast"]
 
 # Colors
 BLACK = (0, 0, 0)

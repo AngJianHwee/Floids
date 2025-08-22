@@ -3,7 +3,7 @@
 import pygame
 import sys
 from settings import *
-from triangle import Triangle
+from boid import Boid
 from ui import UIManager
 
 class Game:
@@ -17,21 +17,13 @@ class Game:
         self.frame_rate = DEFAULT_FPS
         
         self.ui_manager = UIManager()
-        self.triangles = []
-        self._create_scene_objects()
+        self.boids = []
+        self._create_boids()
 
-    def _create_scene_objects(self):
-        """Create and add all triangles to the scene."""
-        # Path for the first triangle
-        path1 = [(100, 100), (200, 200), (300, 150), (400, 250), (150, 350)]
-        triangle1 = Triangle(coords=path1, speed=2, color=YELLOW)
-        self.triangles.append(triangle1)
-
-        # --- ADD MORE TRIANGLES HERE ---
-        # It's now this easy to add another one with a different path and look
-        path2 = [(700, 500), (600, 400), (500, 500), (600, 550)]
-        triangle2 = Triangle(coords=path2, speed=1, color=CYAN, size=(15, 25))
-        self.triangles.append(triangle2)
+    def _create_boids(self):
+        """Create and add all boids to the scene."""
+        for _ in range(BOID_COUNT):
+            self.boids.append(Boid())
         
     def run(self):
         while self.running:
@@ -57,23 +49,15 @@ class Game:
                 self.paused = False # Unpause when speed is changed
 
     def update(self):
-        for triangle in self.triangles:
-            triangle.update()
+        for boid in self.boids:
+            boid.update(self.boids)
 
     def draw(self):
         self.screen.fill(BLACK)
         
-        # Draw path coordinates
-        all_coords = [c for t in self.triangles for c in t.coords]
-        for i, (x, y) in enumerate(all_coords):
-            pygame.draw.circle(self.screen, GREEN, (x, y), 5)
-
-        # Draw triangles and their info
-        for i, triangle in enumerate(self.triangles):
-            triangle.draw(self.screen)
-            # Display info text for each triangle
-            info_text = FONT.render(f"T{i+1}: {triangle.get_info()}", True, WHITE)
-            self.screen.blit(info_text, (10, 10 + i * 20))
+        # Draw boids
+        for boid in self.boids:
+            boid.draw(self.screen)
         
         self.ui_manager.draw(self.screen, self.paused, self.frame_rate)
         
