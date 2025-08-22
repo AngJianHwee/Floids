@@ -2,6 +2,7 @@ import pygame
 import sys
 import random
 import subprocess
+import math
 
 pygame.init()
 GUI = pygame.display.set_mode((800, 600))
@@ -16,6 +17,8 @@ triangle_height = 20
 paused = False
 clock = pygame.time.Clock()
 frame_rate = 30  # Default frame rate
+triangle_rotation = 0  # Initial rotation angle
+rotation_speed_alpha = 0.1  # Adjust for desired rotation speed
 
 # Button dimensions and positions
 button_width = 80
@@ -53,12 +56,18 @@ def draw_button(screen, rect, color, text):
 
 
 def move_towards_next_coord():
-    global triangle_x, triangle_y, current_coord_index
+    global triangle_x, triangle_y, current_coord_index, triangle_rotation
 
     target_x, target_y = coords[current_coord_index]
 
     dx = target_x - triangle_x
     dy = target_y - triangle_y
+
+    angle = math.atan2(dy, dx)  # Calculate the angle
+    target_rotation = math.degrees(angle) - 90  # Adjust the angle
+    
+    # Smooth rotation using alpha
+    triangle_rotation += (target_rotation - triangle_rotation) * rotation_speed_alpha
 
     if dx != 0:
         triangle_x += speed * (dx / max(abs(dx), abs(dy)))
@@ -115,7 +124,17 @@ while run:
         (triangle_x + triangle_width / 2, triangle_y - triangle_height / 2),
         (triangle_x, triangle_y + triangle_height / 2)
     )
-    pygame.draw.polygon(GUI, (255, 255, 0), triangle_points)
+
+    # Rotate the triangle
+    rotated_triangle_points = []
+    for x, y in triangle_points:
+        offset_x = x - triangle_x
+        offset_y = y - triangle_y
+        rotated_x = offset_x * math.cos(math.radians(-triangle_rotation)) - offset_y * math.sin(math.radians(-triangle_rotation)) + triangle_x
+        rotated_y = offset_x * math.sin(math.radians(-triangle_rotation)) + offset_y * math.cos(math.radians(-triangle_rotation)) + triangle_y
+        rotated_triangle_points.append((rotated_x, rotated_y))
+
+    pygame.draw.polygon(GUI, (255, 255, 0), rotated_triangle_points)
 
     # Draw coordinate indicators
     for i, (x, y) in enumerate(coords):
@@ -130,3 +149,4 @@ while run:
 
 pygame.quit()
 sys.exit()
+
