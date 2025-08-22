@@ -1,7 +1,5 @@
 import pygame
 import sys
-import random
-import subprocess
 import math
 
 pygame.init()
@@ -10,10 +8,11 @@ pygame.display.set_caption("The incredible guessing game")
 run = True
 coords = [(100, 100), (200, 200), (300, 150), (400, 250)]  # Example coordinates
 current_coord_index = 0
-triangle_x, triangle_y = coords[current_coord_index]
+position = pygame.math.Vector2(coords[current_coord_index])  # Current position
+direction = pygame.math.Vector2(0, 0)  # Initial direction
 speed = 1  # Adjust for desired speed
 triangle_width = 20
-triangle_height = 20
+triangle_height = 30  # Increased height for a longer triangle
 paused = False
 clock = pygame.time.Clock()
 frame_rate = 30  # Default frame rate
@@ -56,28 +55,48 @@ def draw_button(screen, rect, color, text):
 
 
 def move_towards_next_coord():
-    global triangle_x, triangle_y, current_coord_index, triangle_rotation
+    global current_coord_index, position, triangle_rotation
+    target = pygame.math.Vector2(coords[current_coord_index])
+    if position != target:
+        direction = (target - position).normalize()
+        position += direction * speed
+        # Calculate angle towards the target
+        target_angle = math.degrees(math.atan2(direction.y, direction.x))
+        # Smoothly rotate towards the target angle
+        angle_difference = (target_angle - triangle_rotation) % 360
+        if angle_difference > 180:
+            angle_difference -= 360  # Take the shortest path
+        triangle_rotation += angle_difference * rotation_speed_alpha  # Adjust rotation speed
 
-    target_x, target_y = coords[current_coord_index]
+        # Check if the triangle is close enough to the target coordinate
+        if position.distance_to(target) < speed:
+            position = target  # Snap to the target to avoid overshooting
+    else:
+        # Move to the next coordinate
+        current_coord_index = (current_coord_index + 1) % len(coords)
 
-    dx = target_x - triangle_x
-    dy = target_y - triangle_y
 
-    angle = math.atan2(dy, dx)  # Calculate the angle
-    target_rotation = math.degrees(angle) - 90  # Adjust the angle
-    
-    # Smooth rotation using alpha
-    triangle_rotation += (target_rotation - triangle_rotation) * rotation_speed_alpha
+def draw_triangle(screen, position, rotation, width, height, color):
+    # Define triangle points relative to the center, pointing to the RIGHT by default (0 degrees)
+    # The 'height' is now the length from tip to base.
+    # The 'width' is the width of the base.
+    points = [
+        (height / 2, 0),                 # Tip
+        (-height / 2, -width / 2),       # Back top
+        (-height / 2, width / 2)         # Back bottom
+    ]
 
-    if dx != 0:
-        triangle_x += speed * (dx / max(abs(dx), abs(dy)))
-    if dy != 0:
-        triangle_y += speed * (dy / max(abs(dx), abs(dy)))
+    # Rotate points around the origin (0,0) and then translate them
+    rotated_points = []
+    angle_rad = math.radians(rotation)  # Convert rotation to radians
 
-    # Check if close enough to the target coordinate
-    if abs(triangle_x - target_x) < speed and abs(triangle_y - target_y) < speed:
-        triangle_x, triangle_y = target_x, target_y  # Snap to target
-        current_coord_index = (current_coord_index + 1) % len(coords)  # Move to the next coordinate
+    for x, y in points:
+        # Standard 2D rotation formula
+        rotated_x = x * math.cos(angle_rad) - y * math.sin(angle_rad) + position[0]  # Use index [0] for x
+        rotated_y = x * math.sin(angle_rad) + y * math.cos(angle_rad) + position[1]  # Use index [1] for y
+        rotated_points.append((rotated_x, rotated_y))
+
+    pygame.draw.polygon(screen, color, rotated_points)
 
 
 while run:
@@ -118,23 +137,18 @@ while run:
     draw_button(GUI, fast_button_rect, button_selected_color if button_states["fast"] else button_color, "5 FPS")
     draw_button(GUI, very_fast_button_rect, button_selected_color if button_states["very_fast"] else button_color, "30 FPS")
 
-    # Adjust triangle position to center it
-    triangle_points = (
-        (triangle_x - triangle_width / 2, triangle_y - triangle_height / 2),
-        (triangle_x + triangle_width / 2, triangle_y - triangle_height / 2),
-        (triangle_x, triangle_y + triangle_height / 2)
-    )
+    draw_triangle(GUI, position, triangle_rotation, triangle_width, triangle_height, (255, 255, 0))
+    
+    # Draw direction line
+    direction_end = (position.x + math.cos(math.radians(triangle_rotation)) * triangle_height,
+                        position.y + math.sin(math.radians(triangle_rotation)) * triangle_height)
+    pygame.draw.line(GUI, (255, 0, 0), (position.x, position.y), direction_end, 2)
 
-    # Rotate the triangle
-    rotated_triangle_points = []
-    for x, y in triangle_points:
-        offset_x = x - triangle_x
-        offset_y = y - triangle_y
-        rotated_x = offset_x * math.cos(math.radians(-triangle_rotation)) - offset_y * math.sin(math.radians(-triangle_rotation)) + triangle_x
-        rotated_y = offset_x * math.sin(math.radians(-triangle_rotation)) + offset_y * math.cos(math.radians(-triangle_rotation)) + triangle_y
-        rotated_triangle_points.append((rotated_x, rotated_y))
-
-    pygame.draw.polygon(GUI, (255, 255, 0), rotated_triangle_points)
+    # Add text about current coordinate and position and rotation
+    text_surface = font.render(
+        f"Current Coord: {current_coord_index + 1}/{len(coords)} | Rotation: {triangle_rotation:.2f}° | Position: {position} | Speed: {speed}",
+        True, (255, 255, 255))
+    GUI.blit(text_surface, (10, 10))
 
     # Draw coordinate indicators
     for i, (x, y) in enumerate(coords):
@@ -149,4 +163,10 @@ while run:
 
 pygame.quit()
 sys.exit()
+
+
+
+
+
+
 
