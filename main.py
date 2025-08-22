@@ -12,6 +12,8 @@ coords = [(100, 100), (200, 200), (300, 150), (400, 250)]  # Example coordinates
 current_coord_index = 0
 triangle_x, triangle_y = coords[current_coord_index]
 speed = 1  # Adjust for desired speed
+triangle_width = 20
+triangle_height = 20
 
 
 def move_towards_next_coord():
@@ -39,7 +41,13 @@ while run:
             run = False
 
     GUI.fill((0, 0, 0))
-    pygame.draw.polygon(GUI, (255, 255, 0), ((triangle_x, triangle_y), (triangle_x + 20, triangle_y), (triangle_x + 10, triangle_y + 20)))
+    # Adjust triangle position to center it
+    triangle_points = (
+        (triangle_x - triangle_width / 2, triangle_y - triangle_height / 2),
+        (triangle_x + triangle_width / 2, triangle_y - triangle_height / 2),
+        (triangle_x, triangle_y + triangle_height / 2)
+    )
+    pygame.draw.polygon(GUI, (255, 255, 0), triangle_points)
 
     # Draw coordinate indicators
     for i, (x, y) in enumerate(coords):
