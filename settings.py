@@ -19,6 +19,17 @@ COHESION_WEIGHT = 1.0
 ALIGNMENT_WEIGHT = 1.5
 SEPARATION_WEIGHT = 2.0
 
+# Parameter ranges for UI sliders
+PARAM_RANGES = {
+    "PERCEPTION_RADIUS": {"min": 50, "max": 200, "initial": PERCEPTION_RADIUS, "step": 5},
+    "SEPARATION_RADIUS": {"min": 10, "max": 50, "initial": SEPARATION_RADIUS, "step": 1},
+    "MAX_SPEED": {"min": 1, "max": 10, "initial": MAX_SPEED, "step": 0.5},
+    "MAX_FORCE": {"min": 0.01, "max": 0.1, "initial": MAX_FORCE, "step": 0.01},
+    "COHESION_WEIGHT": {"min": 0.0, "max": 3.0, "initial": COHESION_WEIGHT, "step": 0.1},
+    "ALIGNMENT_WEIGHT": {"min": 0.0, "max": 3.0, "initial": ALIGNMENT_WEIGHT, "step": 0.1},
+    "SEPARATION_WEIGHT": {"min": 0.0, "max": 3.0, "initial": SEPARATION_WEIGHT, "step": 0.1},
+}
+
 # Frame Rates
 FPS_OPTIONS = {
     "slow": 1,

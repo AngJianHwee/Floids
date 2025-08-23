@@ -1,28 +1,29 @@
 # main.py
 
-import pygame
 import sys
-from settings import *
+import pygame
+import settings # Import settings as a module to access its attributes dynamically
 from boid import Boid
 from ui import UIManager
 
 class Game:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        pygame.display.set_caption(GAME_CAPTION)
+        self.screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
+        pygame.display.set_caption(settings.GAME_CAPTION)
         self.clock = pygame.time.Clock()
         self.running = True
         self.paused = False
-        self.frame_rate = DEFAULT_FPS
+        self.frame_rate = settings.DEFAULT_FPS
         
-        self.ui_manager = UIManager()
+        # Pass the settings module to UIManager so it can modify parameters directly
+        self.ui_manager = UIManager(settings) 
         self.boids = []
         self._create_boids()
 
     def _create_boids(self):
         """Create and add all boids to the scene."""
-        for _ in range(BOID_COUNT):
+        for _ in range(settings.BOID_COUNT):
             self.boids.append(Boid())
         
     def run(self):
@@ -51,13 +52,17 @@ class Game:
                 self.boids = []
                 self._create_boids()
                 self.paused = False # Unpause on reset
+            elif action == 'update_param':
+                # Parameter was updated via slider, no direct action needed here
+                # The settings module itself has been updated by UIManager
+                pass
 
     def update(self):
         for boid in self.boids:
             boid.update(self.boids)
 
     def draw(self):
-        self.screen.fill(BLACK)
+        self.screen.fill(settings.BLACK)
         
         # Draw boids
         for boid in self.boids:
@@ -73,7 +78,7 @@ class Game:
     def _draw_legend(self, screen):
         """Draws a legend for the Boids simulation."""
         legend_x = 10
-        legend_y = SCREEN_HEIGHT - 160  # Adjusted slightly for more space
+        legend_y = settings.SCREEN_HEIGHT - 160  # Adjusted slightly for more space
         line_height = 25
         width = 220
         height = 150
@@ -89,28 +94,30 @@ class Game:
         screen.blit(legend_surface, (legend_x, legend_y))
         # ----------------------------------------------------
 
-        # Legend items: (Text, Color, Value)
+        # Legend items: (Text, Color, Value) - now dynamically fetching from settings
         legend_items = [
-            ("Perception Radius", BLUE, PERCEPTION_RADIUS),
-            ("Separation Radius", RED, SEPARATION_RADIUS),
-            ("Cohesion Weight", CYAN, COHESION_WEIGHT),
-            ("Alignment Weight", GREEN, ALIGNMENT_WEIGHT),
-            ("Separation Weight", RED, SEPARATION_WEIGHT),
-            
+            ("Perception Radius", settings.BLUE, settings.PERCEPTION_RADIUS),
+            ("Separation Radius", settings.RED, settings.SEPARATION_RADIUS),
+            ("Cohesion Weight", settings.CYAN, settings.COHESION_WEIGHT),
+            ("Alignment Weight", settings.GREEN, settings.ALIGNMENT_WEIGHT),
+            ("Separation Weight", settings.RED, settings.SEPARATION_WEIGHT),
+            ("Max Speed", settings.WHITE, settings.MAX_SPEED),
+            ("Max Force", settings.WHITE, settings.MAX_FORCE),
         ]
         
         # Draw the text and indicators on top of the transparent background
         for i, (text, color, value) in enumerate(legend_items):
             # Improved: Display text uses the specified color for clarity
-            display_text = f"{text}: {value}"
-            text_surface = FONT.render(display_text, True, color)
+            display_text = f"{text}: {value:.1f}" # Format to one decimal place for consistency
+            text_surface = settings.FONT.render(display_text, True, color)
             
             # Position the text relative to the top-left of the legend area
             text_rect = text_surface.get_rect(topleft=(legend_x + 25, legend_y + 10 + i * line_height))
             screen.blit(text_surface, text_rect)
             
-            # Draw color indicator circle
-            pygame.draw.circle(screen, color, (legend_x + 15, legend_y + 22 + i * line_height), 5)
+            # Draw color indicator circle (only for the original 5 parameters)
+            if i < 5:
+                pygame.draw.circle(screen, color, (legend_x + 15, legend_y + 22 + i * line_height), 5)
 if __name__ == "__main__":
     game = Game()
     game.run()
