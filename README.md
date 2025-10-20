@@ -3,7 +3,9 @@
 This project implements the well known Boids algorithm developed by Craig Reynolds in 1986 [https://en.wikipedia.org/wiki/Boids] using Pygame, packaged within a Docker container. To run the graphical simulation, you will need to enable X11 forwarding.
 
 # Demo
-![Boids Simulation Demo](https://github.com/AngJianHwee/Floids/blob/main/assets/floids-demo.3gp)
+
+https://github.com/user-attachments/assets/4f7a8484-8745-41aa-af97-6586113134ab
+
 
 ## Prerequisites
 
