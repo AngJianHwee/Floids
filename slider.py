@@ -2,13 +2,14 @@ import pygame
 from settings import FONT, WHITE, BUTTON_COLOR, BUTTON_SELECTED_COLOR
 
 class Slider:
-    def __init__(self, x, y, width, height, min_val, max_val, initial_val, label, step=1):
+    def __init__(self, x, y, width, height, min_val, max_val, initial_val, label, step=1, text_color=WHITE):
         self.rect = pygame.Rect(x, y, width, height)
         self.min_val = min_val
         self.max_val = max_val
         self.value = initial_val
         self.label = label
         self.step = step
+        self.text_color = text_color
         self.dragging = False
 
         self.handle_radius = height // 2
@@ -81,6 +82,7 @@ class Slider:
         pygame.draw.circle(screen, BUTTON_SELECTED_COLOR, self.handle_pos, self.handle_radius - 2)
 
         # Draw label and value
-        label_surface = FONT.render(f"{self.label}: {self.value:.1f}", True, WHITE)
+        label_surface = FONT.render(f"{self.label}: {self.value:.1f}", True, self.text_color)
         label_rect = label_surface.get_rect(midleft=(self.rect.right + 10, self.rect.centery))
         screen.blit(label_surface, label_rect)
+

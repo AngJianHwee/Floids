@@ -14,9 +14,17 @@ class UIManager:
         # UI element dimensions and positioning
         slider_width = 150
         slider_height = 20
-        slider_x = SCREEN_WIDTH - slider_width - 150 # Position sliders to the left of buttons
-        slider_y_start = 20
-        slider_spacing = slider_height + 20 # More spacing for sliders
+        
+        # Define margins for UI elements
+        left_margin = 20
+        top_margin = 20
+        right_margin = 20
+        bottom_margin = 20
+        
+        # Sliders in top-left corner
+        slider_x = left_margin
+        slider_y_start = top_margin
+        spacing = slider_height + 20 # More spacing for sliders
 
         self.sliders = []
         current_y = slider_y_start
@@ -25,15 +33,19 @@ class UIManager:
         for param_name, props in PARAM_RANGES.items():
             slider = Slider(
                 slider_x, current_y, slider_width, slider_height,
-                props["min"], props["max"], props["initial"], param_name, props["step"]
+                props["min"], props["max"], props["initial"], param_name, props["step"], props["color"]
             )
             self.sliders.append(slider)
-            current_y += slider_spacing
+            current_y += spacing
 
-        # Position buttons below the sliders
-        button_x = SCREEN_WIDTH - BUTTON_WIDTH - 20
-        button_y_start = current_y + 20 # Start buttons below the last slider
-        spacing = BUTTON_HEIGHT + 10
+        # Buttons in bottom-right corner
+        button_x = SCREEN_WIDTH - BUTTON_WIDTH - right_margin
+        # Calculate button_y_start to place buttons at the bottom, stacking upwards
+        # Determine the number of buttons to calculate the total height needed
+        num_buttons = len(FPS_OPTIONS) + 2 # 4 speed buttons + play/pause + reset
+        total_buttons_height = (BUTTON_HEIGHT * num_buttons) + (spacing * (num_buttons))
+        # button_y_start = SCREEN_HEIGHT - total_buttons_height - bottom_margin 
+        button_y_start = SCREEN_HEIGHT - total_buttons_height - bottom_margin + 180
 
         self.buttons = {
             "play_pause": {"rect": pygame.Rect(button_x, button_y_start, BUTTON_WIDTH, BUTTON_HEIGHT)},

@@ -96,14 +96,15 @@ class Game:
 
         # Legend items: (Text, Color, Value) - now dynamically fetching from settings
         legend_items = [
-            ("Perception Radius", settings.BLUE, settings.PERCEPTION_RADIUS),
-            ("Separation Radius", settings.RED, settings.SEPARATION_RADIUS),
-            ("Cohesion Weight", settings.CYAN, settings.COHESION_WEIGHT),
+            ("Perception Radius", settings.WHITE, settings.PERCEPTION_RADIUS),
+            ("Separation Radius", settings.YELLOW, settings.SEPARATION_RADIUS),
+            ("Cohesion Weight", settings.RED, settings.COHESION_WEIGHT),
             ("Alignment Weight", settings.GREEN, settings.ALIGNMENT_WEIGHT),
-            ("Separation Weight", settings.RED, settings.SEPARATION_WEIGHT),
-            ("Max Speed", settings.WHITE, settings.MAX_SPEED),
+            ("Separation Weight", settings.CYAN, settings.SEPARATION_WEIGHT),
+            ("Max Speed", settings.BLUE, settings.MAX_SPEED),
             ("Max Force", settings.WHITE, settings.MAX_FORCE),
         ]
+        
         
         # Draw the text and indicators on top of the transparent background
         for i, (text, color, value) in enumerate(legend_items):
@@ -112,12 +113,16 @@ class Game:
             text_surface = settings.FONT.render(display_text, True, color)
             
             # Position the text relative to the top-left of the legend area
-            text_rect = text_surface.get_rect(topleft=(legend_x + 25, legend_y + 10 + i * line_height))
+            text_rect = text_surface.get_rect(topleft=(legend_x + 25, legend_y - 30 + i * line_height))
             screen.blit(text_surface, text_rect)
             
             # Draw color indicator circle (only for the original 5 parameters)
-            if i < 5:
-                pygame.draw.circle(screen, color, (legend_x + 15, legend_y + 22 + i * line_height), 5)
+            if i < 2 :
+                pygame.draw.circle(screen, color, (legend_x + 15, legend_y - 30 + 7 + i * line_height), 5)
+            elif 2 <= i < 5:
+                pygame.draw.line(screen, color, (legend_x + 10, legend_y - 30 + 7 + i * line_height), (legend_x + 20, legend_y - 30 + 7 + i * line_height), 3)
+            else:
+                pass # No indicator for Max Speed and Max Force
 if __name__ == "__main__":
     game = Game()
     game.run()

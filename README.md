@@ -1,6 +1,9 @@
-# Boids Simulation with Pygame and Docker
+# Floids: Flocking Simulation - Boids algorithm implementation with Pygame & Docker
 
-This project implements a Boids (flocking simulation) using Pygame, packaged within a Docker container. To run the graphical simulation, you will need to enable X11 forwarding.
+This project implements the well known Boids algorithm developed by Craig Reynolds in 1986 [https://en.wikipedia.org/wiki/Boids] using Pygame, packaged within a Docker container. To run the graphical simulation, you will need to enable X11 forwarding.
+
+# Demo
+![Boids Simulation Demo](assets/floids-demo.3gp)
 
 ## Prerequisites
 
@@ -58,13 +61,6 @@ To display the Pygame window from within the Docker container on your host machi
     ```
     *Note: `host.docker.internal` is a special DNS name that resolves to the internal IP address of the host from within a Docker container. This is generally preferred over hardcoding your IP address.*
 
-### Explanation of X11 Forwarding Parameters
-
-*   `-e DISPLAY=$DISPLAY`: Passes your host's `DISPLAY` environment variable to the container, telling it where to send graphical output.
-*   `-e DISPLAY=host.docker.internal:0`: (macOS specific) Directs the container's graphical output to the X server running on your macOS host via `host.docker.internal`.
-*   `-v /tmp/.X11-unix:/tmp/.X11-unix`: Mounts the X11 socket directory from your host into the container, allowing the container to communicate with your X server.
-*   `-it`: Runs the container in interactive mode and allocates a pseudo-TTY.
-*   `--rm`: Automatically removes the container when it exits.
 
 ## Running the Simulation
 
